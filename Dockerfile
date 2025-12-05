@@ -33,15 +33,17 @@ RUN apt-get update && \
 COPY --from=builder /install /usr/local
 
 # Copy application source code into the image
-# (adjust list if you add more files later)
 COPY main.py decrypt_seed.py totp_utils.py request_seed.py ./
 COPY student_private.pem student_public.pem instructor_public.pem ./
 
-# Cron script and configuration will be created in later steps:
-#   - scripts/log_2fa_cron.py
-#   - cron/2fa-cron
-# For now we create the directories; we'll COPY files after we create them.
+# Copy cron script and configuration
 RUN mkdir -p /app/scripts /app/cron
+COPY scripts/log_2fa_cron.py /app/scripts/log_2fa_cron.py
+COPY cron/2fa-cron /etc/cron.d/2fa-cron
+
+# Set correct permissions and install cron job
+RUN chmod 0644 /etc/cron.d/2fa-cron && crontab /etc/cron.d/2fa-cron
+
 
 # When cron file exists, Dockerfile lines will look like:
 # COPY scripts/log_2fa_cron.py /app/scripts/log_2fa_cron.py
