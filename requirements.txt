@@ -1,0 +1,5 @@
+cryptography
+pyotp
+fastapi
+uvicorn[standard]
+requests
